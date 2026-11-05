@@ -439,65 +439,41 @@ if file is not None:
     # OUTLIER REMOVAL
     # --------------------------------
 
-    elif menu == "Outlier Removal":
+    elif option == "Outlier Removal":
 
-        st.header("Outlier Removal")
+    st.header("Outlier Removal")
 
-        clean_df = df.copy()
+    st.write("Outlier Removal Section is Working!")
 
-        for col in ['Original_Price', 'Discount_Price']:
+    clean_df = df.copy()
 
-            st.subheader(col + " - Before Outlier Removal")
+    for i in ['Original_Price', 'Discount_Price']:
 
-            fig, ax = plt.subplots()
+        st.subheader(i)
 
-            sb.boxplot(x=clean_df[col], ax=ax)
+        q1 = clean_df[i].quantile(0.25)
+        q3 = clean_df[i].quantile(0.75)
 
-            st.pyplot(fig)
-            plt.close(fig)
+        iqr = q3 - q1
 
-            q1 = clean_df[col].quantile(0.25)
-            q3 = clean_df[col].quantile(0.75)
+        c1 = q1 - 1.5 * iqr
+        c2 = q3 + 1.5 * iqr
 
-            iqr = q3 - q1
+        outliers = clean_df[
+            (clean_df[i] < c1) |
+            (clean_df[i] > c2)
+        ]
 
-            c1 = q1 - 1.5 * iqr
-            c2 = q3 + 1.5 * iqr
+        st.write("Outliers:", len(outliers))
 
-            clean_df = clean_df[
-                (clean_df[col] >= c1) &
-                (clean_df[col] <= c2)
-            ]
+        clean_df = clean_df[
+            (clean_df[i] >= c1) &
+            (clean_df[i] <= c2)
+        ]
 
-            st.subheader(col + " - After Outlier Removal")
+    st.success("Outliers Removed!")
 
-            fig, ax = plt.subplots()
-
-            sb.boxplot(x=clean_df[col], ax=ax)
-
-            st.pyplot(fig)
-            plt.close(fig)
-
-        st.success("Outliers removed successfully!")
-
-        col1, col2 = st.columns(2)
-
-        col1.metric("Original Rows", len(df))
-        col2.metric("Rows After Cleaning", len(clean_df))
-
-        st.subheader("Cleaned Dataset")
-
-        st.dataframe(clean_df, use_container_width=True)
-
-        csv = clean_df.to_csv(index=False).encode('utf-8')
-
-        st.download_button(
-            label="Download Cleaned Dataset",
-            data=csv,
-            file_name="Cleaned_Fashion_Trends.csv",
-            mime="text/csv"
-        )
-
+    st.dataframe(clean_df)
 
 else:
 
